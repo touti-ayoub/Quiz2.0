@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/idLLScore"
+    >
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/purple_200"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:textAllCaps="false"
+        android:textAlignment="center"
+        android:text="your score is:"
+        android:layout_margin="10dp"
+        android:padding="3dp"
+        android:id="@+id/idTVScore"
+        />
+    <Button
+        android:id="@+id/idBtnRestart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:text="Quiz"
+        android:textAllCaps="false"
+        android:backgroundTint="#6d6875"
+
+        />
+
+</LinearLayout>
