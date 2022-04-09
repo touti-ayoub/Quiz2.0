@@ -2,6 +2,8 @@ package com.example.quiz20;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,119 +16,101 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity {
-    private TextView questionTV,questionNumberTV;
-    private Button option1Btn,option2Btn,option3Btn,option4Btn;
-    private ArrayList<QuizModel> quizModelArrayList;
-    Random random;
-    int currentScore = 0 , questionAttempted = 0, currentPos;
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
+    TextView totalQuestionsTextView;
+    TextView questionTextView;
+    Button ansA,ansB,ansC,ansD;
+    Button submitBtn;
+
+    int score = 0;
+    int totalQuestion = QuestionAnswers.question.length;
+    int currentQuestionIndex = 0;
+    String selectedAnswer = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        questionTV= findViewById(R.id.idTVQuestion);
-        questionNumberTV=findViewById(R.id.idTVQuestionAttempted);
-        option1Btn=findViewById(R.id.idBtnOption1);
-        option2Btn=findViewById(R.id.idBtnOption2);
-        option3Btn=findViewById(R.id.idBtnOption3);
-        option4Btn=findViewById(R.id.idBtnOption4);
-        quizModelArrayList = new ArrayList<>();
-        random = new Random();
-        getQuizQuestion(quizModelArrayList);
-        currentPos = random.nextInt(quizModelArrayList.size());
-        setDataToViews(currentPos);
-        option1Btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(quizModelArrayList.get(currentPos).getAnswer().trim().toLowerCase().equals(option1Btn.getText().toString().trim().toLowerCase())){
-                    currentScore++;
-                }
-                questionAttempted++;
-                currentPos = random.nextInt(quizModelArrayList.size());
-                setDataToViews(currentPos);
 
-            }
-        });
+        totalQuestionsTextView = findViewById(R.id.total_question);
+        questionTextView = findViewById(R.id.question);
+        ansA = findViewById(R.id.ans_A);
+        ansB = findViewById(R.id.ans_B);
+        ansC = findViewById(R.id.ans_C);
+        ansD = findViewById(R.id.ans_D);
+        submitBtn = findViewById(R.id.submit_btn);
 
-        option2Btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(quizModelArrayList.get(currentPos).getAnswer().trim().toLowerCase().equals(option2Btn.getText().toString().trim().toLowerCase())){
-                    currentScore++;
-                }
-                questionAttempted++;
-                currentPos = random.nextInt(quizModelArrayList.size());
-                setDataToViews(currentPos);
-            }
-        });
+        ansA.setOnClickListener(this);
+        ansB.setOnClickListener(this);
+        ansC.setOnClickListener(this);
+        ansD.setOnClickListener(this);
+        submitBtn.setOnClickListener(this);
 
-        option3Btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(quizModelArrayList.get(currentPos).getAnswer().trim().toLowerCase().equals(option3Btn.getText().toString().trim().toLowerCase())){
-                    currentScore++;
-                }
-                questionAttempted++;
-                currentPos = random.nextInt(quizModelArrayList.size());
-                setDataToViews(currentPos);
-            }
-        });
+        totalQuestionsTextView.setText("Total questions : " + totalQuestion);
 
-        option4Btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(quizModelArrayList.get(currentPos).getAnswer().trim().toLowerCase().equals(option4Btn.getText().toString().trim().toLowerCase())){
-                    currentScore++;
-                }
-                questionAttempted++;
-                currentPos = random.nextInt(quizModelArrayList.size());
-                setDataToViews(currentPos);
-            }
-        });
+        loadNewQuestions();
 
     }
 
-    private void showBottomSheet(){
-        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(MainActivity.this);
-        View bottomSheetView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.score_bottom_sheet,(LinearLayout)findViewById(R.id.idLLScore));
-        TextView scoreTV = bottomSheetView.findViewById(R.id.idTVScore);
-        Button restartQuizBtn = bottomSheetView.findViewById(R.id.idBtnRestart);
-        scoreTV.setText("you score is \n"+currentScore + "/4");
-        restartQuizBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                currentPos = random.nextInt(quizModelArrayList.size());
-                setDataToViews(currentPos);
-                questionAttempted = 0;
-                currentScore = 0;
-                bottomSheetDialog.dismiss();
-            }
-        });
-        bottomSheetDialog.setCancelable(false);
-        bottomSheetDialog.setContentView(bottomSheetView);
-        bottomSheetDialog.show();
-    }
+    @Override
+    public void onClick(View view) {
 
-    private void setDataToViews(int currentPos){
-        questionNumberTV.setText("Question Attempted : "+questionAttempted + "/4");
-        if(questionAttempted == 4){
-            showBottomSheet();
-        }else {
-            questionTV.setText(quizModelArrayList.get(currentPos).getQuestion());
-            option1Btn.setText(quizModelArrayList.get(currentPos).getOption1());
-            option2Btn.setText(quizModelArrayList.get(currentPos).getOption2());
-            option3Btn.setText(quizModelArrayList.get(currentPos).getOption3());
-            option4Btn.setText(quizModelArrayList.get(currentPos).getOption4());
+        ansA.setBackgroundColor(Color.WHITE);
+        ansB.setBackgroundColor(Color.WHITE);
+        ansC.setBackgroundColor(Color.WHITE);
+        ansD.setBackgroundColor(Color.WHITE);
+
+        Button clickedButton = (Button) view;
+        if(clickedButton.getId()==R.id.submit_btn){
+            if(selectedAnswer.equals(QuestionAnswers.correctAnswers[currentQuestionIndex])){
+                score++;
+            }
+            currentQuestionIndex++;
+            loadNewQuestions();
+
+        }else{
+            //choices button clicked
+            selectedAnswer = clickedButton.getText().toString();
+            clickedButton.setBackgroundColor(Color.MAGENTA);
         }
 
-
     }
-    private void getQuizQuestion(ArrayList<QuizModel> quizModelArrayList) {
-        quizModelArrayList.add(new QuizModel("in which year google released?","1998","2000","2004","1995","1998"));
-        quizModelArrayList.add(new QuizModel("What does CPU stand for?","Core Processing Unit","Central Processing Unit","Command Processing Unit","Custom Processing Unit","Central Processing Unit"));
-        quizModelArrayList.add(new QuizModel("what is the name of the first internet search engine?","Google","Yahoo","AOL","Archie","Archie"));
-        quizModelArrayList.add(new QuizModel("Which Programming language is the most widely used?","JavaScript","JAVA","Python","PHP","JavaScript"));
 
+    void loadNewQuestions(){
+
+        if(currentQuestionIndex == totalQuestion){
+            finishQuiz();
+            return;
+        }
+
+        questionTextView.setText(QuestionAnswers.question[currentQuestionIndex]);
+        ansA.setText(QuestionAnswers.choices[currentQuestionIndex][0]);
+        ansB.setText(QuestionAnswers.choices[currentQuestionIndex][1]);
+        ansC.setText(QuestionAnswers.choices[currentQuestionIndex][2]);
+        ansD.setText(QuestionAnswers.choices[currentQuestionIndex][3]);
     }
+
+    void finishQuiz(){
+        String passStatus="";
+        if (score > totalQuestion*0.60){
+            passStatus= "passed";
+        }else{
+            passStatus= "failed";
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle(passStatus)
+                .setMessage("Your score is "+score+"/"+totalQuestion)
+                .setPositiveButton("Start Again",(dialogInterface, i) -> restartQuiz() )
+                .setCancelable(false)
+                .show();
+    }
+
+    void restartQuiz(){
+        score = 0;
+        currentQuestionIndex =0;
+        loadNewQuestions();
+    }
+
 }
